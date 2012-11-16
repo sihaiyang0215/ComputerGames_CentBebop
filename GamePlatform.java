@@ -387,6 +387,13 @@ public class GamePlatform extends BufferedApplet {
     piece.setGamePlatform(this);
     return piece;
   }
+  
+  public Piece removePiece(Piece piece) {
+	  
+	    pieces.remove(piece);
+	    piece.setGamePlatform(this);
+	    return piece;
+	  }
 
   /**
    * Play an audio clip, given the name of the file containing the audio clip.
