@@ -75,15 +75,15 @@ public class Bullet extends DiskPiece implements Comparable<Bullet>{
 		
 		double tempX = 0;
 		double tempY = 0;
-		double increase =0.5*dir_vector;
+		double increase = 1*dir_vector;
 		if (right == true)
-			tempX = newX/20 + increase;
+			tempX = (newX + increase)/20;
 		else
-			tempX = newX/20 - increase;
+			tempX = (newX - increase)/20;
 		if (up == true)
-			tempY = newY/20 - increase;
+			tempY = (newY - increase)/20;
 		else
-			tempY = newY/20 + increase;
+			tempY = (newY + increase)/20;
 		if (tempY < 1 || tempY > 23 || tempX < 1.5 || tempX > 31)// out of boundry
 			return true;
 		return (map[(int) Math.floor(tempY)][(int) Math.floor(tempX)] != 0);
