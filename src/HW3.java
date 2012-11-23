@@ -1,5 +1,7 @@
+import java.applet.AudioClip;
 import java.awt.Color;
 import java.awt.Event;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MediaTracker;
@@ -18,7 +20,7 @@ public class HW3 extends GamePlatform {
 	int raysNum = 160;
 	// boolean showRays =true;
 	double viewDist = 320 / Math.tan((fov / 2));// distance between camera and
-	
+
 	Random random;
 	// view canvas
 	// 32*24 map matrix
@@ -39,38 +41,42 @@ public class HW3 extends GamePlatform {
 	List<Bullet> bulltes = new ArrayList<Bullet>();
 	List<Tank> enemies = new ArrayList<Tank>();
 	Set<Bullet> firedBullets = new TreeSet<Bullet>();
-	
+
 	MediaTracker mt;
 	URL base;
 	Image wall1,wall2,wall3,wall4;
+	private AudioClip backgroundAudio;
 
-	  int[][] level1Map = {
-		      {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
-		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
-		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
-		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
-		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,2,1},
-		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
-		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,3,0,0,0,1},
-		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
-		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
-		      {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-		  } ;
-// int[][] level1Map = {
+	boolean isGameOver = false;
+
+
+	int[][] level1Map = {
+			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+			{1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,2,1},
+			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,3,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
+			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	} ;
+	// int[][] level1Map = {
 	// {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -100,37 +106,43 @@ public class HW3 extends GamePlatform {
 	Tank player = new Tank(this, 1);
 	Tank e_1 = new Tank(this, 2);
 	Tank e_2 = new Tank(this, 3);
-	
+
 	Color playerColor = new Color(0, 255, 0, 150);
 
 	@Override
 	public boolean keyDown(Event e, int key) {
-		switch (key) {
-		// case 109:
-		// showMiniMap = true;
-		// break;
-		case 119:
-			player.dir_vert = 1;
-			break;
-		case 115:
-			player.dir_vert = -1;
-			break;
-		case 100:
-			player.dir_hor = 1;
-			break;
-		case 97:
-			player.dir_hor = -1;
-			break;
-			// case 110:
-			// showRays = true;
+		
+		if(!isGameOver){
+			if(backgroundAudio == null)
+				enableAudio();
+			switch (key) {
+			// case 109:
 			// showMiniMap = true;
 			// break;
-			// case 98:
-			// showAim = true;
-			// break;
-		case 32:
-			player.fire();
-			break;
+			case 119:
+				player.dir_vert = 1;
+				break;
+			case 115:
+				player.dir_vert = -1;
+				break;
+			case 100:
+				player.dir_hor = 1;
+				break;
+			case 97:
+				player.dir_hor = -1;
+				break;
+				// case 110:
+				// showRays = true;
+				// showMiniMap = true;
+				// break;
+				// case 98:
+				// showAim = true;
+				// break;
+			case 32:
+				player.fire();
+				playClip("blast.wav");
+				break;
+			}
 		}
 		return super.keyDown(e, key);
 	}
@@ -167,15 +179,15 @@ public class HW3 extends GamePlatform {
 	@Override
 	public void drawMap(Graphics g) {
 
-		
-		
+
+
 		for (int j = 0; j < 24; j++) {
 			for (int i = 0; i < 32; i++) {
 				switch (level1Map[j][i]) {
 				case 1:
 					// g.setColor(boundryColor);
 					//g.setColor(Color.DARK_GRAY);
-					
+
 					//g.fillRect(i * 20, j * 20, 20, 20);
 					if(wall1 == null){
 						wall1 = intializeImage("wall2.jpg");
@@ -184,9 +196,9 @@ public class HW3 extends GamePlatform {
 					break;
 				case 2:
 					// g.setColor(brickColor);
-//					g.setColor(Color.RED);
-//					g.fillRect(i * 20, j * 20, 20, 20);
-					
+					//					g.setColor(Color.RED);
+					//					g.fillRect(i * 20, j * 20, 20, 20);
+
 					if(wall2 == null){
 						wall2 = intializeImage("wall3.jpg");
 					}
@@ -206,7 +218,7 @@ public class HW3 extends GamePlatform {
 					}
 					g.drawImage(wall4,i * 20, j * 20, 20, 20,this);
 					break;
-					
+
 				}
 			}
 		}
@@ -222,8 +234,21 @@ public class HW3 extends GamePlatform {
 				(int) ((player.y_pos + Math.sin(player.angle) * 1) * 20));
 		for (Tank tank : enemies) {
 			g.drawLine((int) (tank.x_pos * 20), (int) (tank.y_pos * 20),
-				(int) ((tank.x_pos + Math.cos(tank.angle) * 1) * 20),
-				(int) ((tank.y_pos + Math.sin(tank.angle) * 1) * 20));
+					(int) ((tank.x_pos + Math.cos(tank.angle) * 1) * 20),
+					(int) ((tank.y_pos + Math.sin(tank.angle) * 1) * 20));
+		}
+
+
+		//update players HP
+		double x = player.model.centerX;
+		double y = player.model.centerY;
+		g.setColor(Color.green);
+		g.fillRect((int)x-10,(int) y+10,player.tankHP,5);
+
+
+		for (Tank tank : enemies) {
+			g.setColor(Color.red);
+			g.fillRect((int)tank.model.centerX-10,(int)tank.model.centerY+10,tank.tankHP,5);
 		}
 	}
 
@@ -252,26 +277,41 @@ public class HW3 extends GamePlatform {
 			if(CD(player, bullet))
 				if(bullet.getOwner().isPlayer())
 					continue;
-				else
-					System.out.println("player hit");;//minus player's HP
-			
+				else{
+					player.tankHP --;
+					if(player.tankHP <= 0){
+						isGameOver = true;
+						this.stop();
+						//game over
+					}else{
+						removeBullet(bullet);
+					}
+					System.out.println("player hit"+player.tankHP);;//minus player's HP
+				}
+
 			for (Tank tank : enemies) {				
 				if(CD(tank, bullet))
 					if(bullet.getOwner().isPlayer())
 					{
 						//do minus e_1's HP
-						removePiece(tank.getModel());
-						enemies.remove(tank);
-						System.out.println("enemy "+ tank.id+" hit");
+						tank.tankHP--;
+
+						if(tank.tankHP <= 0){
+							removePiece(tank.getModel());
+							enemies.remove(tank);
+						}
+						removeBullet(bullet);
+
+						System.out.println("enemy "+ tank.id+" hit"+tank.tankHP);
 					}
 					else
 						continue;
 			}
 
 		}
-		
+
 	}
-	
+
 	private void updateEnemies() {
 		for (Tank tank : enemies) 
 		{	
@@ -279,10 +319,10 @@ public class HW3 extends GamePlatform {
 			double dy = player.y_pos - tank.y_pos;
 			tank.dir_vert = 1;
 			int dir_rand = random.nextInt();
-			
+
 			boolean notMove_X=Math.abs(tank.old_x-tank.x_pos)<0.01;
 			boolean notMove_Y=Math.abs(tank.old_y-tank.y_pos) <0.01;
-			
+
 			if(dir_rand%100>95)
 				tank.fire();
 			if(notMove_X&&notMove_Y)
@@ -304,20 +344,20 @@ public class HW3 extends GamePlatform {
 				}
 			}
 
-			
-			
+
+
 		}
-		
+
 	}
 
 	public boolean CD(Tank tank, Bullet bullet)
 	{
 		double dx = tank.x_pos*20 - bullet.x;
 		double dy = tank.y_pos*20 - bullet.y;
-		
+
 		//System.out.println("tank's x= "+ tank.x_pos );
 		//System.out.println("bullet's x= "+ bullet.x );
-		
+
 		double d = Math.sqrt(dx*dx+ dy*dy);
 		if(d < 20)//player's size
 		{
@@ -463,6 +503,11 @@ public class HW3 extends GamePlatform {
 		for (Tank tank : enemies) {
 			tank.update(level1Map);
 		}
+		
+		if(isGameOver){
+			g.setFont(new Font("Verdana",Font.BOLD,30));
+			g.drawString("GAME OVER",250,250);
+		}
 		// castRays(g, level1Map,false);
 	}
 
@@ -479,15 +524,15 @@ public class HW3 extends GamePlatform {
 	// }
 
 	public void setup() {
-		
-		
-		
+
+
+
 		//setCollisionTracked(player.getModel());
 		//setCollisionTracked(e_1.getModel());
-		
+
 		random = new Random(System.currentTimeMillis()); 
-		
-		
+
+
 		player.model.setImage(intializeImage("tank.png"));	
 		addPiece(player.model);
 		e_1.model.setImage(intializeImage("enemy.png"));
@@ -499,17 +544,17 @@ public class HW3 extends GamePlatform {
 		e_2.model.setImage(intializeImage("enemy.png"));
 
 		addPiece(e_2.model);
-		
+
 		e_2.x_pos = 20;
 		e_2.y_pos = 14;
 		enemies.add(e_2);		
-		
+
 	}
 
 	Image intializeImage(String imagename){
 
 
-		
+
 		// initialize the MediaTracker 
 		mt = new MediaTracker(this);
 
@@ -520,17 +565,17 @@ public class HW3 extends GamePlatform {
 		try { 
 			// getDocumentbase gets the applet path. 
 			base = getDocumentBase();
-//			String path = base.toString();
-//			System.out.println(path);
-//
-//			String folders[] = path.split("/");
-//			path = "";
-//			for(int i = 0 ; i<folders.length-1; i++){
-//				path +=(folders[i]+"/");
-//			}
-//			path += "Resources/";
-//			System.out.println(path);
-//			base = new URL(path);
+			//			String path = base.toString();
+			//			System.out.println(path);
+			//
+			//			String folders[] = path.split("/");
+			//			path = "";
+			//			for(int i = 0 ; i<folders.length-1; i++){
+			//				path +=(folders[i]+"/");
+			//			}
+			//			path += "Resources/";
+			//			System.out.println(path);
+			//			base = new URL(path);
 		} 
 		catch (Exception e) {}
 
@@ -546,11 +591,33 @@ public class HW3 extends GamePlatform {
 		try { 
 			mt.waitForAll(); 
 		} 
-		
+
 		catch (InterruptedException  e) {}
-		
+
 		return backgroundImage;
 
+	}
+
+	public void enableAudio()
+	{
+		if(this.backgroundAudio == null)
+		{
+			this.backgroundAudio = this.getAudioClip(base,
+			"fire.wav");
+		}
+
+		this.backgroundAudio.loop();
+	}
+
+	public void stop(){
+		disableAudio();
+	}
+
+	public void disableAudio()
+	{
+		if (this.backgroundAudio != null) {
+			this.backgroundAudio.stop();
+		}
 	}
 
 

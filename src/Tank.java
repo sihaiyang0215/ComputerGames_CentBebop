@@ -20,7 +20,9 @@ public class Tank {
 	int id;
 	
 	RectPiece model;
-
+	
+	
+	int tankHP = 20;
 
 	public Tank(HW3 hw3,int id) {
 		
