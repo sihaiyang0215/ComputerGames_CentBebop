@@ -40,7 +40,7 @@ public class Bullet extends DiskPiece implements Comparable<Bullet>{
 		up = false;
 	}
 
-	public void update(int[][] map) {
+	public boolean update(int[][] map) {
 
 		double moveStepX = 0.0;
 		double moveStepY = 0.0;
@@ -65,8 +65,10 @@ public class Bullet extends DiskPiece implements Comparable<Bullet>{
 			
 			currentX = newX;
 			currentY = newY;
+			return true;
 		}else{
 			Owner.getApplet().removeBullet(this);
+			return false;
 		}
 
 	}
@@ -75,7 +77,7 @@ public class Bullet extends DiskPiece implements Comparable<Bullet>{
 		
 		double tempX = 0;
 		double tempY = 0;
-		double increase = 1*dir_vector;
+		double increase =0.5*dir_vector;
 		if (right == true)
 			tempX = (newX + increase)/20;
 		else

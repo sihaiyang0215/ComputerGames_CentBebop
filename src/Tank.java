@@ -16,13 +16,12 @@ public class Tank {
 	double old_x;
 	double old_y;
 	
+	int HP = 3;
+	
 	HW3 applet;
 	int id;
 	
 	RectPiece model;
-	
-	
-	int tankHP = 20;
 
 	public Tank(HW3 hw3,int id) {
 		
@@ -115,7 +114,7 @@ public class Tank {
 	}
 
 	public boolean isPlayer() {
-		if(this.id == 1){
+		if(this.id == 100){
 			return true;
 		}
 		return false;

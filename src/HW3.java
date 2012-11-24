@@ -1,7 +1,6 @@
 import java.applet.AudioClip;
 import java.awt.Color;
 import java.awt.Event;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MediaTracker;
@@ -12,15 +11,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.ImageIcon;
-
 public class HW3 extends GamePlatform {
 
 	double fov = Math.PI / 3; // 60 degree
 	int raysNum = 160;
 	// boolean showRays =true;
 	double viewDist = 320 / Math.tan((fov / 2));// distance between camera and
-
+	
 	Random random;
 	// view canvas
 	// 32*24 map matrix
@@ -29,120 +26,124 @@ public class HW3 extends GamePlatform {
 	// 2 - brick wall
 	// 3 - stone wall
 	// 4 - home
-	// Color boundryColor = new Color(150,150,150,100);
-	// Color brickColor = new Color(178,34,34,100);
-	// Color stoneColor = new Color(250,250,250,100);
-	// Color homeColor = new Color(255,215,5,100);
-	// For temp use
-	// Color boundryColor1 = new Color(150,150,150,100);
-	// Color brickColor1 = new Color(186,34,34);
-	// Color stoneColor1 = new Color(250,250,250,100);
-
 	List<Bullet> bulltes = new ArrayList<Bullet>();
 	List<Tank> enemies = new ArrayList<Tank>();
 	Set<Bullet> firedBullets = new TreeSet<Bullet>();
-
+	
 	MediaTracker mt;
 	URL base;
 	Image wall1,wall2,wall3,wall4;
 	private AudioClip backgroundAudio;
+	
+//	int NUM_enemy = playedLevel * 2;
 
-	boolean isGameOver = false;
+	int[][][] level1Map = {
+		      {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,3,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
+		      {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}},
+		      
+		      {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,3,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
+		      {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}},
+		      
+		      {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
+		      {1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,3,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
+		      {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
+		      {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}}
+		  } ;
 
+	Tank player = new Tank(this, 100);
 
-	int[][] level1Map = {
-			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-			{1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
-			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
-			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
-			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0,1},
-			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,2,1},
-			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1},
-			{1,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,3,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1},
-			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	} ;
-	// int[][] level1Map = {
-	// {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	// {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	// } ;
-
-	Tank player = new Tank(this, 1);
-	Tank e_1 = new Tank(this, 2);
-	Tank e_2 = new Tank(this, 3);
-
-	Color playerColor = new Color(0, 255, 0, 150);
+//	Tank e_1 = new Tank(this, 2);
+//	Tank e_2 = new Tank(this, 3);
+	
+	Color playerColor = new Color(0, 255, 0);
+	Color enemyColor = new Color(255, 0, 0);
 
 	@Override
 	public boolean keyDown(Event e, int key) {
-		
-		if(!isGameOver){
+		if(gameover == false && playing == true){
 			if(backgroundAudio == null)
 				enableAudio();
-			switch (key) {
-			// case 109:
-			// showMiniMap = true;
-			// break;
-			case 119:
-				player.dir_vert = 1;
-				break;
-			case 115:
-				player.dir_vert = -1;
-				break;
-			case 100:
-				player.dir_hor = 1;
-				break;
-			case 97:
-				player.dir_hor = -1;
-				break;
-				// case 110:
-				// showRays = true;
-				// showMiniMap = true;
-				// break;
-				// case 98:
-				// showAim = true;
-				// break;
-			case 32:
-				player.fire();
-				playClip("blast.wav");
-				break;
-			}
+		}
+		switch (key) {
+		case 119:
+			player.dir_vert = 1;
+			break;
+		case 115:
+			player.dir_vert = -1;
+			break;
+		case 100:
+			player.dir_hor = 1;
+			break;
+		case 97:
+			player.dir_hor = -1;
+			break;
+		case 32:
+			player.fire();
+			break;
 		}
 		return super.keyDown(e, key);
 	}
@@ -150,9 +151,6 @@ public class HW3 extends GamePlatform {
 	@Override
 	public boolean keyUp(Event e, int key) {
 		switch (key) {
-		// case 109:
-		// // showMiniMap = false;
-		// break;
 		case 119:
 			player.dir_vert = 0;
 			break;
@@ -165,54 +163,35 @@ public class HW3 extends GamePlatform {
 		case 97:
 			player.dir_hor = 0;
 			break;
-			// case 110:
-			// showRays = false;
-			// showMiniMap = false;
-			// break;
-			// case 98:
-			// showAim = false;
-			// break;
 		}
 		return super.keyUp(e, key);
 	}
 
 	@Override
 	public void drawMap(Graphics g) {
-
-
-
+		if(playedLevel <= 3){
 		for (int j = 0; j < 24; j++) {
 			for (int i = 0; i < 32; i++) {
-				switch (level1Map[j][i]) {
+				switch (level1Map[playedLevel - 1][j][i]) {
 				case 1:
-					// g.setColor(boundryColor);
-					//g.setColor(Color.DARK_GRAY);
-
-					//g.fillRect(i * 20, j * 20, 20, 20);
 					if(wall1 == null){
 						wall1 = intializeImage("wall2.jpg");
 					}
 					g.drawImage(wall1,i * 20, j * 20, 20, 20,this);
 					break;
 				case 2:
-					// g.setColor(brickColor);
-					//					g.setColor(Color.RED);
-					//					g.fillRect(i * 20, j * 20, 20, 20);
-
 					if(wall2 == null){
 						wall2 = intializeImage("wall3.jpg");
 					}
 					g.drawImage(wall2,i * 20, j * 20, 20, 20,this);
 					break;
 				case 3:
-					// g.setColor(stoneColor);
 					if(wall3 == null){
 						wall3 = intializeImage("wall1.jpg");
 					}
 					g.drawImage(wall3,i * 20, j * 20, 20, 20,this);
 					break;
 				case 4:
-					// g.setColor(homeColor);
 					if(wall4 == null){
 						wall4 = intializeImage("wall4.jpg");
 					}
@@ -223,95 +202,85 @@ public class HW3 extends GamePlatform {
 			}
 		}
 
-		// player.update(level1Map);
-
-		g.setColor(playerColor);
-		//g.fillRect((int) (player.x_pos * 20) - 10,
-		//		(int) (player.y_pos * 20) - 10, 20, 20);
 		g.setColor(Color.WHITE);
+		
 		g.drawLine((int) (player.x_pos * 20), (int) (player.y_pos * 20),
 				(int) ((player.x_pos + Math.cos(player.angle) * 1) * 20),
 				(int) ((player.y_pos + Math.sin(player.angle) * 1) * 20));
 		for (Tank tank : enemies) {
+			tank.model.setColor(Color.red);
 			g.drawLine((int) (tank.x_pos * 20), (int) (tank.y_pos * 20),
-					(int) ((tank.x_pos + Math.cos(tank.angle) * 1) * 20),
-					(int) ((tank.y_pos + Math.sin(tank.angle) * 1) * 20));
+				(int) ((tank.x_pos + Math.cos(tank.angle) * 1) * 20),
+				(int) ((tank.y_pos + Math.sin(tank.angle) * 1) * 20));
 		}
-
-
-		//update players HP
-		double x = player.model.centerX;
-		double y = player.model.centerY;
-		g.setColor(Color.green);
-		g.fillRect((int)x-10,(int) y+10,player.tankHP,5);
-
-
-		for (Tank tank : enemies) {
-			g.setColor(Color.red);
-			g.fillRect((int)tank.model.centerX-10,(int)tank.model.centerY+10,tank.tankHP,5);
-		}
+	}
 	}
 
 	@Override
 	public void update() {
+		if (playedLevel <= 3) {
+			if (enemies.size() == 0) {
+				playing = false;
+				disableAudio();
+				backgroundAudio = null;
+				playedLevel++;
 
-		// castRays(g, level1Map, false);
-		updateEnemies();
-
-		for (Bullet bullet : bulltes) {
-
-			bullet.update(level1Map);
-			bullet.setBounds(bullet.getCurrentX(), bullet.getCurrentY(),
-					bullet.getSize(), bullet.getSize());
-			if (!firedBullets.contains(bullet)) {
-
-				bullet.setColor(Color.RED);
-				addPiece(bullet);
-				firedBullets.add(bullet);
+				initGM();
+				stop();
 			}
-		}
-		for (Bullet bullet : firedBullets) 
-		{
-			//please use list to store tank objects.
-			//then traverse the list
-			if(CD(player, bullet))
-				if(bullet.getOwner().isPlayer())
+
+			updateEnemies();
+
+			for (int i = 0; i < bulltes.size(); i++) {
+				Bullet bullet = bulltes.get(i);
+				if (!bullet.update(level1Map[playedLevel - 1]))
 					continue;
-				else{
-					player.tankHP --;
-					if(player.tankHP <= 0){
-						isGameOver = true;
-						this.stop();
-						//game over
-					}else{
-						removeBullet(bullet);
-					}
-					System.out.println("player hit"+player.tankHP);;//minus player's HP
+				bullet.setBounds(bullet.getCurrentX(), bullet.getCurrentY(),
+						bullet.getSize(), bullet.getSize());
+				if (!firedBullets.contains(bullet)) {
+
+					bullet.setColor(Color.RED);
+					addPiece(bullet);
+					firedBullets.add(bullet);
 				}
+			}
+			for (Bullet bullet : firedBullets) {
+				// please use list to store tank objects.
+				// then traverse the list
+				if (CD(player, bullet))
+					if (bullet.getOwner().isPlayer())
+						
+						continue;
+					else {
+						player.HP--;
+						removeBullet(bullet);
+						firedBullets.remove(bullet);
+						System.out.println(player.HP);
+						if (player.HP == 0) {
+							playing = false;
+						}
+						break;
+					}
 
-			for (Tank tank : enemies) {				
-				if(CD(tank, bullet))
-					if(bullet.getOwner().isPlayer())
-					{
-						//do minus e_1's HP
-						tank.tankHP--;
-
-						if(tank.tankHP <= 0){
+				for (int i = 0; i < enemies.size(); i++) {
+					Tank tank = enemies.get(i);
+					if (CD(tank, bullet))
+						if (bullet.getOwner().isPlayer()) {
+							// do minus e_1's HP
+							removeBullet(bullet);
+							firedBullets.remove(bullet);
 							removePiece(tank.getModel());
 							enemies.remove(tank);
-						}
-						removeBullet(bullet);
+							System.out.println("enemy " + tank.id + " hit");
+							break;
+						} else
+							continue;
+				}
 
-						System.out.println("enemy "+ tank.id+" hit"+tank.tankHP);
-					}
-					else
-						continue;
 			}
-
 		}
-
 	}
-
+	
 	private void updateEnemies() {
 		for (Tank tank : enemies) 
 		{	
@@ -319,10 +288,10 @@ public class HW3 extends GamePlatform {
 			double dy = player.y_pos - tank.y_pos;
 			tank.dir_vert = 1;
 			int dir_rand = random.nextInt();
-
+			
 			boolean notMove_X=Math.abs(tank.old_x-tank.x_pos)<0.01;
 			boolean notMove_Y=Math.abs(tank.old_y-tank.y_pos) <0.01;
-
+			
 			if(dir_rand%100>95)
 				tank.fire();
 			if(notMove_X&&notMove_Y)
@@ -343,21 +312,14 @@ public class HW3 extends GamePlatform {
 						tank.angle = Math.PI*3/2;
 				}
 			}
-
-
-
 		}
-
 	}
 
 	public boolean CD(Tank tank, Bullet bullet)
 	{
 		double dx = tank.x_pos*20 - bullet.x;
 		double dy = tank.y_pos*20 - bullet.y;
-
-		//System.out.println("tank's x= "+ tank.x_pos );
-		//System.out.println("bullet's x= "+ bullet.x );
-
+		
 		double d = Math.sqrt(dx*dx+ dy*dy);
 		if(d < 20)//player's size
 		{
@@ -368,192 +330,73 @@ public class HW3 extends GamePlatform {
 
 	public void addBullet(Bullet b) {
 		bulltes.add(b);
-		//setCollisionTracked(b);
 	}
 
 	public void removeBullet(Bullet b) {
+		for (int i =0;i< bulltes.size();i++) 
+		{
+			if(bulltes.get(i) == b)
+				bulltes.remove(i);
+		}
+		if(firedBullets.contains(b))
+			firedBullets.remove(b);
 		removePiece(b);
-	}
-
-	// cast a ray from camera and test its distance to the nearest obstacle
-	public void castRay(double angle, int[][] map, Graphics g, int rayNum) {
-		// clip angle into 0 to 360 degree
-		angle %= Math.PI * 2;
-		if (angle < 0)
-			angle += Math.PI * 2;
-
-		// detect direction
-		boolean right = false;
-		if (angle > Math.PI * 1.5 || angle < Math.PI * 0.5)
-			right = true;
-		boolean up = false;
-		if (angle > Math.PI)
-			up = true;
-
-		int textureIndex = 0;
-		double dist = 0; // the distance to the obstacle
-		double distX = 0; // the x distance to obstacle
-		double distY = 0; // the y distance to obstacle
-		double xHit = 0; // the x, y cordinate of obstacle
-		double yHit = 0;
-
-		// double tanAngle = Math.sin(angle)/Math.cos(angle);
-		double tanAngle = Math.tan(angle);
-		double dx = right ? 1 : -1;
-		double dy = dx * tanAngle;
-
-		double start_x = right ? Math.ceil(player.x_pos) : Math
-				.floor(player.x_pos);
-		double start_y = player.y_pos + (start_x - player.x_pos) * tanAngle;
-
-		double x = 0;// temp x, y in order to test obstacle
-		double y = 0;
-
-		// loop to find the obstacle
-		while (start_x >= 0 && start_x < 32 && start_y >= 0 && start_y < 24) {
-			if (right == false) {
-				x = Math.floor(start_x) - 1;
-			} else
-				x = Math.floor(start_x);
-			y = Math.floor(start_y);
-
-			// System.out.println(y+" "+x+" "+map[(int)y][(int)x]);
-
-			// is this point inside a wall block?
-			if (map[(int) y][(int) x] > 0) {
-				distX = start_x - player.x_pos;
-				distY = start_y - player.y_pos;
-				dist = distX * distX + distY * distY; // the squared distance
-				// from the player to
-				// this point
-
-				// save the coordinates of the hit.
-				xHit = start_x;
-				yHit = start_y;
-				textureIndex = map[(int) y][(int) x];
-				break;
-			}
-			start_x += dx;
-			start_y += dy;
-		}
-
-		// now check against horizontal lines.
-		// to get cot(angle)
-		if (tanAngle != 0)
-			tanAngle = 1 / tanAngle;
-		dy = up ? -1 : 1;
-		dx = dy * tanAngle;
-		start_y = up ? Math.floor(player.y_pos) : Math.ceil(player.y_pos);
-		start_x = player.x_pos + (start_y - player.y_pos) * tanAngle;
-		double blockDist = 0;
-
-		while (start_x >= 0 && start_x < 32 && start_y >= 0 && start_y < 24) {
-			if (up == true)
-				y = (int) Math.floor(start_y) - 1;
-			else
-				y = (int) Math.floor(start_y);
-			x = (int) Math.floor(start_x);
-			if (map[(int) y][(int) x] > 0) {
-				distX = start_x - player.x_pos;
-				distY = start_y - player.y_pos;
-				blockDist = distX * distX + distY * distY;
-				if (dist == 0 || blockDist < dist) {
-					dist = blockDist;
-					xHit = start_x;
-					yHit = start_y;
-					textureIndex = map[(int) y][(int) x];
-				}
-				break;
-			}
-			start_x += dx;
-			start_y += dy;
-		}
-
-		if (dist > 0) {
-
-			dist = Math.sqrt(dist);
-			dist = dist * Math.cos(player.angle - angle);
-
-			// double height = Math.round(viewDist / dist);
-			// double top = Math.round((480 - height) / 2);
-			// switch(textureIndex){
-			// case 1:
-			// g.setColor(Color.darkGray);
-			// break;
-			// case 2:
-			// g.setColor(brickColor1);
-			// break;
-			// case 3:
-			// g.setColor(Color.gray);
-			// break;
-			// }
-			// g.fillRect(rayNum*4, (int)top, (int)4, (int)height);
-			// show casting rays on mini map
-			// if(showRays == true){
-			// g.setColor(new Color(100,200,100,100));
-			// g.drawLine((int)(player.x_pos* 20), (int)(player.y_pos*20),
-			// (int)Math.round(xHit*20), (int)Math.round(yHit*20));
-			// }
-		}
 	}
 
 	@Override
 	public void drawWorld(Graphics g) {
-		player.update(level1Map);
-		for (Tank tank : enemies) {
-			tank.update(level1Map);
+		if (playedLevel <= 3) {
+			player.update(level1Map[playedLevel - 1]);
+			for (Tank tank : enemies) {
+				tank.update(level1Map[playedLevel - 1]);
+			}
 		}
-		
-		if(isGameOver){
-			g.setFont(new Font("Verdana",Font.BOLD,30));
-			g.drawString("GAME OVER",250,250);
-		}
-		// castRays(g, level1Map,false);
 	}
-
-	// public void castRays(Graphics g, int[][] map, boolean showRays) {
-	// double rayScreenPos=0;
-	// double rayAngle=0;
-	// int rayNum = 0;
-	// for (int i=0;i<raysNum;i++) {
-	// rayScreenPos = (i-raysNum/2) * (640/raysNum);
-	// rayAngle = Math.atan(rayScreenPos/ viewDist);
-	// castRay(player.angle + rayAngle, map, g, rayNum);
-	// rayNum ++;
-	// }
-	// }
 
 	public void setup() {
-
-
-
-		//setCollisionTracked(player.getModel());
-		//setCollisionTracked(e_1.getModel());
-
+		
 		random = new Random(System.currentTimeMillis()); 
-
-
-		player.model.setImage(intializeImage("tank.png"));	
+		int NUM_enemy = playedLevel * 2;
+		Tank e[] = new Tank[NUM_enemy];
+		for(int i = 0; i < NUM_enemy; i++){
+			e[i] = new Tank(this, i);
+			addPiece(e[i].model);
+			e[i].x_pos = 5 + 2 * i;
+			e[i].y_pos = 14;
+			enemies.add(e[i]);
+		}
+		
 		addPiece(player.model);
-		e_1.model.setImage(intializeImage("enemy.png"));
-		addPiece(e_1.model);
-		e_1.x_pos = 14;
-		e_1.y_pos = 14;
-		enemies.add(e_1);
-
-		e_2.model.setImage(intializeImage("enemy.png"));
-
-		addPiece(e_2.model);
-
-		e_2.x_pos = 20;
-		e_2.y_pos = 14;
-		enemies.add(e_2);		
-
+		player.HP = 3;
+		player.x_pos = 13;
+		player.y_pos = 22;
 	}
 
+	public void initGM(){
+		bulltes.clear();
+		enemies.clear();
+		firedBullets.clear();
+		removeAllPiece();
+		setup();
+	}
+
+	private Bullet getBullet(Piece one) {
+		for (Bullet b : bulltes) {
+			if (one == b) {
+				return b;
+			}
+		}
+		return null;
+	}
+
+	private Tank getTank(Piece one) {
+		if(one == player.model){
+			return player;
+		}
+		return null;
+	}
+	
 	Image intializeImage(String imagename){
-
-
 
 		// initialize the MediaTracker 
 		mt = new MediaTracker(this);
@@ -563,19 +406,8 @@ public class HW3 extends GamePlatform {
 		// Java itself.
 
 		try { 
-			// getDocumentbase gets the applet path. 
 			base = getDocumentBase();
-			//			String path = base.toString();
-			//			System.out.println(path);
-			//
-			//			String folders[] = path.split("/");
-			//			path = "";
-			//			for(int i = 0 ; i<folders.length-1; i++){
-			//				path +=(folders[i]+"/");
-			//			}
-			//			path += "Resources/";
-			//			System.out.println(path);
-			//			base = new URL(path);
+
 		} 
 		catch (Exception e) {}
 
@@ -597,7 +429,7 @@ public class HW3 extends GamePlatform {
 		return backgroundImage;
 
 	}
-
+	
 	public void enableAudio()
 	{
 		if(this.backgroundAudio == null)
@@ -609,9 +441,6 @@ public class HW3 extends GamePlatform {
 		this.backgroundAudio.loop();
 	}
 
-	public void stop(){
-		disableAudio();
-	}
 
 	public void disableAudio()
 	{
@@ -619,22 +448,34 @@ public class HW3 extends GamePlatform {
 			this.backgroundAudio.stop();
 		}
 	}
-
-
-	private Bullet getBullet(Piece one) {
-		for (Bullet b : bulltes) {
-			if (one == b) {
-				return b;
-			}
+	
+	public void overlay(Graphics g) {
+		if(playing == true){
+		g.setColor(Color.GREEN);
+		g.drawString("HP LEFT: " + player.HP, 40, 50);
 		}
-		return null;
-	}
+		if(player.HP == 0){
 
-	private Tank getTank(Piece one) {
-		if(one == player.model){
-			return player;
+			disableAudio();
+		      backgroundAudio = null;
+		      initGM();
+		      g.setColor(Color.black);
+		      g.fillRect(0, 0, w, h);
+		      g.setColor(Color.white);
+		      g.setFont(labelFont);
+		      g.drawString("GAME OVER", w / 2 - 80, h / 2);
+		      g.drawString("Click to restart game", w / 3 - 10, h - 30);
+			  gameover = true;
+			  playing = false;
+		      stop();
 		}
-		return null;
+		
+		if(playedLevel > 3){
+			g.setColor(Color.black);
+			g.fillRect(0, 0, w, h);
+			g.setColor(Color.white);
+			g.setFont(labelFont);
+			g.drawString("YOU WIN!!!!! " , w / 2 - 40, h / 2);
+		}
 	}
-
 }
